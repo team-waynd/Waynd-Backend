@@ -15,13 +15,18 @@ services:
     image: mysql:8.0
     container_name: waynd-db
     restart: always
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 3s
+      retries: 5
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: waynd
       MYSQL_USER: waynd
       MYSQL_PASSWORD: dugodrkwk
     ports:
-      - '3306:3306'
+      - '3307:3306'
     volumes:
       - waynd_mysql_data:/var/lib/mysql
 
