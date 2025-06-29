@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity'; // 실제 경로에 맞게 수정
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
