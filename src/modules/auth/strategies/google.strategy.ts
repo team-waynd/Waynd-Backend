@@ -34,13 +34,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       const providerId = id;
       const email = emails?.[0]?.value ?? '';
       const fullName = `${name?.familyName ?? ''}${name?.givenName ?? ''}`;
-
+      const provider = 'google';
       const profileImage = profile.photos?.[0]?.value ?? '';
 
       const user: User = await this.userService.findByEmailOrSave(
         email,
         fullName,
         providerId,
+        provider,
         profileImage,
       );
 

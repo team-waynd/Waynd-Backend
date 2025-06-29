@@ -18,6 +18,7 @@ export class UserService {
     email: string,
     name: string,
     providerId: string,
+    provider: 'kakao' | 'google',
     profileImage: string,
   ): Promise<User> {
     const existingUser = await this.findByEmail(email);
@@ -26,7 +27,7 @@ export class UserService {
     const newUser = this.userRepository.create({
       email,
       name,
-      provider: 'google',
+      provider,
       providerId,
       profileImage,
     });
