@@ -1,7 +1,11 @@
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { GoogleAuthGuard, JwtRefreshGuard } from './guards/auth.guard';
+import {
+  GoogleAuthGuard,
+  JwtRefreshGuard,
+  KakaoAuthGuard,
+} from './guards/auth.guard';
 import { User } from '../user/user.entity';
 
 interface JwtPayload {
@@ -20,6 +24,19 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(
+    @Req() req: Request,
+  ): Promise<ReturnType<AuthService['login']>> {
+    const user = req.user as User;
+    return this.authService.login(user);
+  }
+
+  @Get('kakao')
+  @UseGuards(KakaoAuthGuard)
+  async kakaoAuth(): Promise<void> {}
+
+  @Get('kakao/redirect')
+  @UseGuards(KakaoAuthGuard)
+  async kakaoAuthRedirect(
     @Req() req: Request,
   ): Promise<ReturnType<AuthService['login']>> {
     const user = req.user as User;

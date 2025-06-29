@@ -5,6 +5,9 @@ import { Injectable } from '@nestjs/common';
 export class GoogleAuthGuard extends AuthGuard('google') {}
 
 @Injectable()
+export class KakaoAuthGuard extends AuthGuard('kakao') {}
+
+@Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {}
 
 @Injectable()
