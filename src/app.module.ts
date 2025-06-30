@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // 앞으로 여기에 실제 기능 모듈들을 import
 // import { UserModule } from './modules/user/user.module';
 // import { AuthModule } from './modules/auth/auth.module';
+import { PlaceModule } from './modules/place/place.module';
 
 @Module({
   imports: [
@@ -27,6 +28,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
     // UserModule,
     // AuthModule,
+    PlaceModule,
   ],
+
 })
 export class AppModule {}
