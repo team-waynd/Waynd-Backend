@@ -20,5 +20,9 @@ export class PlaceController {
     return this.placeService.getThemesByRegion(region.toLowerCase());
   }
 
-
+  // 테마 선택 시 : 해당 테마에 속하는 지역 목록 
+  @Get('/themes/:theme/regions')
+  getRegionsByTheme(@Param('theme') theme: string) {
+    return this.placeService.getRegionsByTheme(theme.toLowerCase());
+  }
 }

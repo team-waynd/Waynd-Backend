@@ -31,6 +31,15 @@ export class PlaceService {
       category: 'beach',
       theme: 'tour',
     },
+    {
+      id: 3,
+      region_id: 2,
+      name: '부산 힐링스팟',
+      description: '요가와 명상 장소',
+      thumbnail: 'healing.jpg',
+      category: 'wellness',
+      theme: 'healing',
+    },
   ];
 
   private readonly foodSpots: Food_spot[] = [
@@ -79,5 +88,27 @@ export class PlaceService {
     }
 
     return result;
+  }
+
+  // 테마 리스트
+  // 테마 기반 지역 추천
+  getRegionsByTheme(theme: string): Region[] {
+    const validThemes = ['tour', 'food', 'history', 'healing', 'activity'];
+    if (!validThemes.includes(theme)) {
+      throw new BadRequestException(`Invalid theme: ${theme}`);
+    }
+
+    let regionIds: number[];
+
+    if (theme === 'food') {
+      regionIds = this.foodSpots.map((f) => f.region_id);
+    } else {
+      regionIds = this.tourSpots
+        .filter((t) => t.theme === theme)
+        .map((t) => t.region_id);
+    }
+
+    const uniqueIds = [...new Set(regionIds)];
+    return this.regions.filter((r) => uniqueIds.includes(r.id));
   }
 }
