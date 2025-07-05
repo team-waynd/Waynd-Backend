@@ -3,112 +3,128 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Region, Tour_spot, Food_spot } from './place.entity';
 
 @Injectable()
 export class PlaceService {
-  private readonly regions: Region[] = [
-    { id: 1, name: 'seoul' },
-    { id: 2, name: 'busan' },
-  ];
-
-  private readonly tourSpots: Tour_spot[] = [
-    {
-      id: 1,
-      region_id: 1,
-      name: '경복궁',
-      description: '조선 시대 궁궐',
-      thumbnail: 'gyeongbokgung.jpg',
-      category: 'palace',
-      theme: 'tour',
-    },
-    {
-      id: 2,
-      region_id: 2,
-      name: '해운대 해수욕장',
-      description: '부산 대표 관광지',
-      thumbnail: 'haeundae.jpg',
-      category: 'beach',
-      theme: 'tour',
-    },
-    {
-      id: 3,
-      region_id: 2,
-      name: '부산 힐링스팟',
-      description: '요가와 명상 장소',
-      thumbnail: 'healing.jpg',
-      category: 'wellness',
-      theme: 'healing',
-    },
-  ];
-
-  private readonly foodSpots: Food_spot[] = [
-    {
-      id: 1,
-      region_id: 1,
-      name: '을지로 골뱅이',
-      description: '서울의 노포 맛집',
-      thumbnail: 'food1.jpg',
-      category: 'korean',
-      rating: 4.7,
-    },
-    {
-      id: 2,
-      region_id: 2,
-      name: '광안리 회센터',
-      description: '부산의 신선한 회',
-      thumbnail: 'sashimi.jpg',
-      category: 'seafood',
-      rating: 4.8,
-    },
-  ];
+  constructor(
+    @InjectRepository(Region)
+    private readonly regionRepository: Repository<Region>,
+    @InjectRepository(Tour_spot)
+    private readonly tourSpotRepository: Repository<Tour_spot>,
+    @InjectRepository(Food_spot)
+    private readonly foodSpotRepository: Repository<Food_spot>,
+  ) {}
 
   // 지역 검색 시 테마 목록 제공
-  getThemesByRegion(regionName: string): { theme: string; count: number }[] {
-    const region = this.regions.find((r) => r.name === regionName);
-    if (!region)
-      throw new NotFoundException(`Region "${regionName}" not found`);
+  async getThemesByRegion(
+    regionName: string,
+  ): Promise<{ theme: string; count: number }[]> {
+    const region = await this.regionRepository.findOne({
+      where: { name: regionName },
+    });
 
-    const regionId = region.id;
+    if (!region) {
+      throw new NotFoundException(`Region "${regionName}" not found`);
+    }
+
+    const [tourCount, foodCount] = await Promise.all([
+      this.tourSpotRepository.count({ where: { region_id: region.id } }),
+      this.foodSpotRepository.count({ where: { region_id: region.id } }),
+    ]);
 
     const result: { theme: string; count: number }[] = [];
-
-    const tourCount = this.tourSpots.filter(
-      (t) => t.region_id === regionId && t.theme === 'tour',
-    ).length;
     if (tourCount > 0) {
       result.push({ theme: 'tour', count: tourCount });
     }
-
-    const foodCount = this.foodSpots.filter(
-      (f) => f.region_id === regionId,
-    ).length;
     if (foodCount > 0) {
       result.push({ theme: 'food', count: foodCount });
     }
-
+    if (result.length === 0) {
+      throw new NotFoundException(`No themes found for region "${regionName}"`);
+    }
     return result;
   }
 
-  // 테마 리스트
   // 테마 기반 지역 추천
-  getRegionsByTheme(theme: string): Region[] {
+  async getRandomPlaceByTheme(theme: string): Promise<Tour_spot | Food_spot> {
     const validThemes = ['tour', 'food', 'history', 'healing', 'activity'];
     if (!validThemes.includes(theme)) {
       throw new BadRequestException(`Invalid theme: ${theme}`);
     }
 
-    let regionIds: number[];
+    let places: Tour_spot[] | Food_spot[] = [];
 
     if (theme === 'food') {
-      regionIds = this.foodSpots.map((f) => f.region_id);
+      // Food_spot에는 theme 필드가 없기 때문에 전체 목록 가져오기
+      places = await this.foodSpotRepository.find();
     } else {
-      regionIds = this.tourSpots
-        .filter((t) => t.theme === theme)
-        .map((t) => t.region_id);
+      // Tour_spot에는 theme 필드가 있으므로 해당 테마로 필터링
+      places = await this.tourSpotRepository.find({
+        where: {
+          theme: theme as 'tour' | 'food' | 'history' | 'healing' | 'activity',
+        },
+      });
     }
 
-    const uniqueIds = [...new Set(regionIds)];
-    return this.regions.filter((r) => uniqueIds.includes(r.id));
+    if (places.length === 0) {
+      throw new NotFoundException(`No places found for theme "${theme}"`);
+    }
+    const randomIndex = Math.floor(Math.random() * places.length);
+    return places[randomIndex];
+  }
+
+  // 테마와 지역에 따른 장소 검색
+  // theme: 'tour' or 'food'
+  async getPlacesByThemeAndRegion(
+    theme: string,
+    regionName: string,
+  ): Promise<(Tour_spot | Food_spot)[]> {
+    const region = await this.regionRepository.findOne({
+      where: { name: regionName },
+    });
+
+    if (!region)
+      throw new NotFoundException(`Region "${regionName}" not found`);
+
+    if (theme === 'tour') {
+      return this.tourSpotRepository.find({
+        where: { region_id: region.id },
+      });
+    } else if (theme === 'food') {
+      return this.foodSpotRepository.find({
+        where: { region_id: region.id },
+      });
+    } else {
+      throw new BadRequestException(`Invalid theme: ${theme}`);
+    }
+  }
+
+  async getPlaceDetail(regionName: string, theme: string, id: number) {
+    const region = await this.regionRepository.findOne({
+      where: { name: regionName },
+    });
+    if (!region)
+      throw new NotFoundException(`Region "${regionName}" not found`);
+
+    if (theme === 'tour') {
+      const place = await this.tourSpotRepository.findOne({
+        where: { id, region_id: region.id },
+      });
+      if (!place)
+        throw new NotFoundException(`Tour spot with id ${id} not found`);
+      return place;
+    } else if (theme === 'food') {
+      const place = await this.foodSpotRepository.findOne({
+        where: { id, region_id: region.id },
+      });
+      if (!place)
+        throw new NotFoundException(`Food spot with id ${id} not found`);
+      return place;
+    } else {
+      throw new BadRequestException(`Invalid theme: ${theme}`);
+    }
   }
 }
