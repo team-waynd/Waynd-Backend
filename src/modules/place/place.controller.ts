@@ -43,11 +43,12 @@ export class PlaceController {
     );
   }
 
+  // 장소 상세 조회
   @Get('/:region/:theme/:id')
   getPlaceDetail(
     @Param('region') region: string,
     @Param('theme') theme: string,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ) {
     if (!region || !theme || !id) {
       throw new BadRequestException(

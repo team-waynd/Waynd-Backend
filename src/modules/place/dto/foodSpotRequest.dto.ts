@@ -1,6 +1,9 @@
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateFoodSpotDto {
+  @IsNumber()
+  region_id: number;
+
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -20,6 +23,6 @@ export class CreateFoodSpotDto {
   @IsNumber()
   rating: number;
 
-  @IsNumber()
-  region_id: number;
+  @IsString()
+  weather: string;
 }

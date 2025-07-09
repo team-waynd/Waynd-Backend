@@ -6,4 +6,5 @@ export class FoodSpotResponseDto {
   category: string;
   rating: number;
   regionName: string;
+  weather: string;
 }

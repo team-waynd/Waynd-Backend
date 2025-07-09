@@ -102,7 +102,7 @@ export class PlaceService {
     }
   }
 
-  async getPlaceDetail(regionName: string, theme: string, id: number) {
+  async getPlaceDetail(regionName: string, theme: string, id: string) {
     const region = await this.regionRepository.findOne({
       where: { name: regionName },
     });
