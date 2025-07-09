@@ -1,6 +1,8 @@
+import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './modules/user/user.module';
 // 앞으로 여기에 실제 기능 모듈들을 import
 // import { UserModule } from './modules/user/user.module';
 // import { AuthModule } from './modules/auth/auth.module';
@@ -29,7 +31,8 @@ import { PlaceModule } from './modules/place/place.module';
     // UserModule,
     // AuthModule,
     PlaceModule,
+    UserModule,
+    AuthModule,
   ],
-
 })
 export class AppModule {}
