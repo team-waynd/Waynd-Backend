@@ -6,6 +6,7 @@ import { UserModule } from './modules/user/user.module';
 // 앞으로 여기에 실제 기능 모듈들을 import
 // import { UserModule } from './modules/user/user.module';
 // import { AuthModule } from './modules/auth/auth.module';
+import { PlaceModule } from './modules/place/place.module';
 
 @Module({
   imports: [
@@ -27,6 +28,9 @@ import { UserModule } from './modules/user/user.module';
       retryDelay: 3000,
     }),
 
+    // UserModule,
+    // AuthModule,
+    PlaceModule,
     UserModule,
     AuthModule,
   ],
