@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/createPost.dto';
-import { Post, PostImage, PostTag } from './post.entity';
+import { Post, PostImage, PostTag, Tag } from './post.entity';
 
 @Injectable()
 export class PostService {
@@ -13,7 +13,44 @@ export class PostService {
     private postImageRepository: Repository<PostImage>,
     @InjectRepository(PostTag)
     private postTagRepository: Repository<PostTag>,
+    @InjectRepository(Tag)
+    private tagRepository: Repository<Tag>,
   ) {}
+
+  async getAllPosts() {
+    const posts = await this.postRepository.find();
+
+    const postIds = posts.map((post) => post.id);
+
+    const images = await this.postImageRepository.find({
+      where: { post_id: In(postIds) },
+    });
+
+    const postTags = await this.postTagRepository.find({
+      where: { post_id: In(postIds) },
+    });
+
+    const tagIds = postTags.map((pt) => pt.tag_id);
+    const tags = await this.tagRepository.find({
+      where: { id: In(tagIds) },
+    });
+
+    const result = posts.map((post) => {
+      const postImages = images.filter((img) => img.post_id === post.id);
+      const relatedTagIds = postTags
+        .filter((pt) => pt.post_id === post.id)
+        .map((pt) => pt.tag_id);
+      const postTagsData = tags.filter((tag) => relatedTagIds.includes(tag.id));
+
+      return {
+        ...post,
+        images: postImages,
+        tags: postTagsData,
+      };
+    });
+
+    return result;
+  }
 
   async createPost(createPostDto: CreatePostDto): Promise<Post> {
     const {
