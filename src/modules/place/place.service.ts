@@ -5,17 +5,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Region, Tour_spot, Food_spot } from './place.entity';
+import { Region, TourSpot, FoodSpot } from './place.entity';
 
 @Injectable()
 export class PlaceService {
   constructor(
     @InjectRepository(Region)
     private readonly regionRepository: Repository<Region>,
-    @InjectRepository(Tour_spot)
-    private readonly tourSpotRepository: Repository<Tour_spot>,
-    @InjectRepository(Food_spot)
-    private readonly foodSpotRepository: Repository<Food_spot>,
+    @InjectRepository(TourSpot)
+    private readonly tourSpotRepository: Repository<TourSpot>,
+    @InjectRepository(FoodSpot)
+    private readonly foodSpotRepository: Repository<FoodSpot>,
   ) {}
 
   // 지역 검색 시 테마 목록 제공
@@ -49,13 +49,13 @@ export class PlaceService {
   }
 
   // 테마 기반 지역 추천
-  async getRandomPlaceByTheme(theme: string): Promise<Tour_spot | Food_spot> {
+  async getRandomPlaceByTheme(theme: string): Promise<TourSpot | FoodSpot> {
     const validThemes = ['tour', 'food', 'history', 'healing', 'activity'];
     if (!validThemes.includes(theme)) {
       throw new BadRequestException(`Invalid theme: ${theme}`);
     }
 
-    let places: Tour_spot[] | Food_spot[] = [];
+    let places: TourSpot[] | FoodSpot[] = [];
 
     if (theme === 'food') {
       // Food_spot에는 theme 필드가 없기 때문에 전체 목록 가져오기
@@ -81,7 +81,7 @@ export class PlaceService {
   async getPlacesByThemeAndRegion(
     theme: string,
     regionName: string,
-  ): Promise<(Tour_spot | Food_spot)[]> {
+  ): Promise<(TourSpot | FoodSpot)[]> {
     const region = await this.regionRepository.findOne({
       where: { name: regionName },
     });

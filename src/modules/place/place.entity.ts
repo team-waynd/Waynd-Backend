@@ -10,7 +10,7 @@ export class Region {
 }
 
 @Entity('tour_spots')
-export class Tour_spot {
+export class TourSpot {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -34,7 +34,7 @@ export class Tour_spot {
 }
 
 @Entity('food_spots')
-export class Food_spot {
+export class FoodSpot {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
