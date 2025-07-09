@@ -1,6 +1,9 @@
 import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
 
 export class CreateTourSpotDto {
+  @IsNumber()
+  region_id: number;
+
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -13,13 +16,6 @@ export class CreateTourSpotDto {
   @IsNotEmpty()
   thumbnail: string;
 
-  @IsString()
-  @IsNotEmpty()
-  category: string;
-
   @IsEnum(['tour', 'food', 'history', 'activity', 'healing'])
   theme: 'tour' | 'food' | 'history' | 'activity' | 'healing';
-
-  @IsNumber()
-  region_id: number;
 }

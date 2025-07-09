@@ -11,8 +11,8 @@ export class Region {
 
 @Entity('tour_spots')
 export class Tour_spot {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   region_id: number;
@@ -20,14 +20,11 @@ export class Tour_spot {
   @Column()
   name: string;
 
-  @Column()
+  @Column('text')
   description: string;
 
   @Column()
   thumbnail: string;
-
-  @Column()
-  category: string;
 
   @Column({
     type: 'enum',
@@ -38,8 +35,8 @@ export class Tour_spot {
 
 @Entity('food_spots')
 export class Food_spot {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   region_id: number;
@@ -47,7 +44,7 @@ export class Food_spot {
   @Column()
   name: string;
 
-  @Column()
+  @Column('text')
   description: string;
 
   @Column()
@@ -58,4 +55,7 @@ export class Food_spot {
 
   @Column()
   rating: number;
+
+  @Column()
+  weather: string;
 }
