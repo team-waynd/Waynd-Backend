@@ -100,4 +100,41 @@ export class PostService {
     // 3. 태그 삭제
     await this.postTagRepository.delete({ post_id: id });
   }
+
+  async updatePost(id: string, updatePostDto: CreatePostDto) {
+    const { title, content, rating, image_urls, tag_ids } = updatePostDto;
+
+    // 1. 게시글 업데이트
+    await this.postRepository.update(id, {
+      title,
+      content,
+      rating,
+      updated_at: new Date(),
+    });
+
+    // 2. 이미지 업데이트
+    if (image_urls) {
+      // 기존 이미지 삭제
+      await this.postImageRepository.delete({ post_id: id });
+
+      // 새로운 이미지 저장
+      const images = image_urls.map((url) => ({
+        post_id: id,
+        image_url: url,
+      }));
+      await this.postImageRepository.save(images);
+    }
+    // 3. 태그 업데이트
+    if (tag_ids) {
+      // 기존 태그 삭제
+      await this.postTagRepository.delete({ post_id: id });
+
+      // 새로운 태그 저장
+      const tags = tag_ids.map((tag_id) => ({
+        post_id: id,
+        tag_id: tag_id,
+      }));
+      await this.postTagRepository.save(tags);
+    }
+  }
 }
