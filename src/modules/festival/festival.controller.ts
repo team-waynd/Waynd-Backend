@@ -10,8 +10,13 @@ export class FestivalController {
     return this.festivalService.getAllFestivals();
   }
 
-  @Get('/:regionName')
+  @Get('/region/:regionName')
   getFestivalsByRegion(@Param('regionName') regionName: string) {
     return this.festivalService.getFestivalsByRegion(regionName);
+  }
+
+  @Get('/:id')
+  getFestivalById(@Param('id') id: string) {
+    return this.festivalService.getFestivalById(id);
   }
 }

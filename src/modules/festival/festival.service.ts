@@ -35,4 +35,17 @@ export class FestivalService {
 
     return festivals;
   }
+
+  async getFestivalById(id: string): Promise<Festival> {
+    const festival = await this.festivalRepository.findOne({
+      where: { id },
+      relations: ['region'],
+    });
+
+    if (!festival) {
+      throw new NotFoundException(`Festival with ID "${id}" not found.`);
+    }
+
+    return festival;
+  }
 }
