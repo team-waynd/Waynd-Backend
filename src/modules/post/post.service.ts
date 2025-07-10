@@ -89,4 +89,15 @@ export class PostService {
 
     return post;
   }
+
+  async deletePost(id: string): Promise<void> {
+    // 1. 게시글 삭제
+    await this.postRepository.delete(id);
+
+    // 2. 이미지 삭제
+    await this.postImageRepository.delete({ post_id: id });
+
+    // 3. 태그 삭제
+    await this.postTagRepository.delete({ post_id: id });
+  }
 }
