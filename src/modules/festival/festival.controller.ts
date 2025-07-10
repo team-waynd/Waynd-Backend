@@ -9,4 +9,9 @@ export class FestivalController {
   getAllFestivals() {
     return this.festivalService.getAllFestivals();
   }
+
+  @Get('/:regionName')
+  getFestivalsByRegion(@Param('regionName') regionName: string) {
+    return this.festivalService.getFestivalsByRegion(regionName);
+  }
 }
