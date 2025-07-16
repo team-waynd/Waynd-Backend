@@ -3,10 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/createPost.dto';
 import { Post, PostImage, PostTag, Tag } from './post.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostService {
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
     @InjectRepository(PostImage)
@@ -63,27 +65,29 @@ export class PostService {
       tag_ids,
     } = createPostDto;
 
-    const post = await this.postRepository.save({
-      user_id,
-      targetRegionId,
-      title,
-      content,
-      rating,
+    return await this.dataSource.transaction(async (manager) => {
+      const post = await this.postRepository.save({
+        user_id,
+        targetRegionId,
+        title,
+        content,
+        rating,
+      });
+
+      const images = image_urls.map((url) => ({
+        post_id: post.id,
+        image_url: url,
+      }));
+      await this.postImageRepository.save(images);
+
+      const tags = tag_ids.map((tag_id) => ({
+        post_id: post.id,
+        tag_id: tag_id,
+      }));
+      await this.postTagRepository.save(tags);
+
+      return post;
     });
-
-    const images = image_urls.map((url) => ({
-      post_id: post.id,
-      image_url: url,
-    }));
-    await this.postImageRepository.save(images);
-
-    const tags = tag_ids.map((tag_id) => ({
-      post_id: post.id,
-      tag_id: tag_id,
-    }));
-    await this.postTagRepository.save(tags);
-
-    return post;
   }
 
   async deletePost(id: string): Promise<void> {
