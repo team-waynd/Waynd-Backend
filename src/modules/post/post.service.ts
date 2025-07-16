@@ -99,31 +99,33 @@ export class PostService {
   async updatePost(id: string, updatePostDto: CreatePostDto): Promise<void> {
     const { title, content, rating, image_urls, tag_ids } = updatePostDto;
 
-    await this.postRepository.update(id, {
-      title,
-      content,
-      rating,
-      updated_at: new Date(),
+    return await this.dataSource.transaction(async (manager) => {
+      await this.postRepository.update(id, {
+        title,
+        content,
+        rating,
+        updated_at: new Date(),
+      });
+
+      if (image_urls) {
+        await this.postImageRepository.delete({ post_id: id });
+
+        const images = image_urls.map((url) => ({
+          post_id: id,
+          image_url: url,
+        }));
+        await this.postImageRepository.save(images);
+      }
+
+      if (tag_ids) {
+        await this.postTagRepository.delete({ post_id: id });
+
+        const tags = tag_ids.map((tag_id) => ({
+          post_id: id,
+          tag_id: tag_id,
+        }));
+        await this.postTagRepository.save(tags);
+      }
     });
-
-    if (image_urls) {
-      await this.postImageRepository.delete({ post_id: id });
-
-      const images = image_urls.map((url) => ({
-        post_id: id,
-        image_url: url,
-      }));
-      await this.postImageRepository.save(images);
-    }
-
-    if (tag_ids) {
-      await this.postTagRepository.delete({ post_id: id });
-
-      const tags = tag_ids.map((tag_id) => ({
-        post_id: id,
-        tag_id: tag_id,
-      }));
-      await this.postTagRepository.save(tags);
-    }
   }
 }
