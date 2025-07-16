@@ -63,7 +63,6 @@ export class PostService {
       tag_ids,
     } = createPostDto;
 
-    // 1. 게시글 저장
     const post = await this.postRepository.save({
       user_id,
       targetRegionId,
@@ -72,14 +71,12 @@ export class PostService {
       rating,
     });
 
-    // 2. 이미지 저장
     const images = image_urls.map((url) => ({
       post_id: post.id,
       image_url: url,
     }));
     await this.postImageRepository.save(images);
 
-    // 3. 태그 저장
     const tags = tag_ids.map((tag_id) => ({
       post_id: post.id,
       tag_id: tag_id,
@@ -90,20 +87,14 @@ export class PostService {
   }
 
   async deletePost(id: string): Promise<void> {
-    // 1. 게시글 삭제
-    await this.postRepository.delete(id);
-
-    // 2. 이미지 삭제
     await this.postImageRepository.delete({ post_id: id });
-
-    // 3. 태그 삭제
     await this.postTagRepository.delete({ post_id: id });
+    await this.postRepository.delete(id);
   }
 
-  async updatePost(id: string, updatePostDto: CreatePostDto):Promise<void> {
+  async updatePost(id: string, updatePostDto: CreatePostDto): Promise<void> {
     const { title, content, rating, image_urls, tag_ids } = updatePostDto;
 
-    // 1. 게시글 업데이트
     await this.postRepository.update(id, {
       title,
       content,
@@ -111,24 +102,19 @@ export class PostService {
       updated_at: new Date(),
     });
 
-    // 2. 이미지 업데이트
     if (image_urls) {
-      // 기존 이미지 삭제
       await this.postImageRepository.delete({ post_id: id });
 
-      // 새로운 이미지 저장
       const images = image_urls.map((url) => ({
         post_id: id,
         image_url: url,
       }));
       await this.postImageRepository.save(images);
     }
-    // 3. 태그 업데이트
+
     if (tag_ids) {
-      // 기존 태그 삭제
       await this.postTagRepository.delete({ post_id: id });
 
-      // 새로운 태그 저장
       const tags = tag_ids.map((tag_id) => ({
         post_id: id,
         tag_id: tag_id,
