@@ -1,11 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
-
-interface UserType {
-  sub: string;
-  email: string;
-}
+import { User } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -17,10 +13,13 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getMyProfile(@Req() req: { user: UserType }) {
+  async getMyProfile(@Req() req: { user: User }) {
+    const userId = req.user.id;
+    const userInfo = await this.userService.findById(userId);
     return {
-      message: '인증된 사용자입니다.',
-      user: req.user,
+      name: userInfo?.name,
+      email: userInfo?.email,
+      profileImg: userInfo?.profileImage,
     };
   }
 }
