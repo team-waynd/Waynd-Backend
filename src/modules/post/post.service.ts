@@ -70,7 +70,6 @@ export class PostService {
       title,
       content,
       rating,
-      created_at: new Date(),
     });
 
     // 2. 이미지 저장
@@ -101,7 +100,7 @@ export class PostService {
     await this.postTagRepository.delete({ post_id: id });
   }
 
-  async updatePost(id: string, updatePostDto: CreatePostDto) {
+  async updatePost(id: string, updatePostDto: CreatePostDto):Promise<void> {
     const { title, content, rating, image_urls, tag_ids } = updatePostDto;
 
     // 1. 게시글 업데이트

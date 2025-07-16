@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsArray, IsNotEmpty } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -17,10 +17,12 @@ export class CreatePostDto {
   rating: number;
 
   @IsArray()
+  @IsNotEmpty()
   @IsString({ each: true })
   image_urls: string[];
 
   @IsArray()
+  @IsNotEmpty()
   @IsNumber({}, { each: true })
   tag_ids: number[];
 }
