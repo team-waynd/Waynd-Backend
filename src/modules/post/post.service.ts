@@ -91,9 +91,11 @@ export class PostService {
   }
 
   async deletePost(id: string): Promise<void> {
-    await this.postImageRepository.delete({ post_id: id });
-    await this.postTagRepository.delete({ post_id: id });
-    await this.postRepository.delete(id);
+    await this.dataSource.transaction(async (manager) => {
+      await this.postImageRepository.delete({ post_id: id });
+      await this.postTagRepository.delete({ post_id: id });
+      await this.postRepository.delete(id);
+    });
   }
 
   async updatePost(id: string, updatePostDto: CreatePostDto): Promise<void> {
