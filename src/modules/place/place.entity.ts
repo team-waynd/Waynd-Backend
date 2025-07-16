@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Festival } from '../festival/festival.entity';
 
 @Entity('regions')
 export class Region {
@@ -7,6 +9,9 @@ export class Region {
 
   @Column()
   name: string;
+
+  @OneToMany(() => Festival, (festival) => festival.region)
+  festivals: Festival[];
 }
 
 @Entity('tour_spots')

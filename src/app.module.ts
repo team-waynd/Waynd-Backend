@@ -1,13 +1,14 @@
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { FestivalModule } from './modules/festival/festival.module';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './modules/user/user.module';
 // 앞으로 여기에 실제 기능 모듈들을 import
 // import { UserModule } from './modules/user/user.module';
 // import { AuthModule } from './modules/auth/auth.module';
 import { PlaceModule } from './modules/place/place.module';
 import { PostModule } from './modules/post/post.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -29,12 +30,11 @@ import { PostModule } from './modules/post/post.module';
       retryDelay: 3000,
     }),
 
-    // UserModule,
-    // AuthModule,
     PlaceModule,
     UserModule,
     AuthModule,
     PostModule,
+    FestivalModule,
   ],
 })
 export class AppModule {}
