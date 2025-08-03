@@ -1,4 +1,5 @@
 import { AuthModule } from './modules/auth/auth.module';
+import { BookmarkModule } from './modules/bookmark/bookmark.module';
 import { ConfigModule } from '@nestjs/config';
 import { FestivalModule } from './modules/festival/festival.module';
 import { Module } from '@nestjs/common';
@@ -32,6 +33,7 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     PostModule,
     FestivalModule,
+    BookmarkModule,
   ],
 })
 export class AppModule {}
