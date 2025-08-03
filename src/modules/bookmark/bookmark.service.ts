@@ -13,7 +13,7 @@ export class BookmarkService {
   async getBookmarkFestivals(userId: string) {
     return this.bookmarkRepository.find({
       where: {
-        userId,
+        user: { id: userId },
         type: 'festival',
       },
     });
@@ -22,7 +22,7 @@ export class BookmarkService {
   async getBookmarkSpots(userId: string) {
     return this.bookmarkRepository.find({
       where: {
-        userId,
+        user: { id: userId },
         type: 'spot',
       },
     });
@@ -31,7 +31,7 @@ export class BookmarkService {
   async getBookmarkRestaurants(userId: string) {
     return this.bookmarkRepository.find({
       where: {
-        userId,
+        user: { id: userId },
         type: 'food',
       },
     });
