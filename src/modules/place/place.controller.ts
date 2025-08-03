@@ -7,6 +7,9 @@ import {
 } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { getThemeResponseDto } from './dto/getThemeResponseDto.dto';
+import { getAllPlacesResponseDto } from './dto/getAllPlacesResponseDto.dto';
+import { getPlaceDetailResponseDto } from './dto/getPlaceDetailResponseDto.dto';
 
 @ApiTags('Places')
 @Controller('places')
@@ -18,7 +21,8 @@ export class PlaceController {
   @ApiOperation({ summary: '지역 기반 테마 검색' })
   @ApiResponse({
     status: 200,
-    // type: string,
+    type: getThemeResponseDto,
+    isArray: true,
     description: '해당 지역과 연결된 테마 목록을 반환합니다.',
   })
   getThemesByRegion(@Query('region') region: string) {
@@ -33,7 +37,8 @@ export class PlaceController {
   @ApiOperation({ summary: '테마 기반 지역 검색' })
   @ApiResponse({
     status: 200,
-    // type: GetAllFestivalsResponseDto,
+    type: getAllPlacesResponseDto,
+    isArray: true,
     description: '성공적으로 모든 지역 리스트를 반환합니다.',
   })
   getRandomPlaceByTheme(@Param('theme') theme: string) {
@@ -45,7 +50,8 @@ export class PlaceController {
   @ApiOperation({ summary: '테마 및 지역 기반 장소 검색' })
   @ApiResponse({
     status: 200,
-    // type: GetAllFestivalsResponseDto,
+    type: getAllPlacesResponseDto,
+    isArray: true,
     description: '성공적으로 모든 장소 리스트를 반환합니다.',
   })
   getPlacesByThemeAndRegion(
@@ -68,7 +74,7 @@ export class PlaceController {
   @ApiOperation({ summary: '장소 상세 검색' })
   @ApiResponse({
     status: 200,
-    // type: GetAllFestivalsResponseDto,
+    type: getPlaceDetailResponseDto,
     description: '성공적으로 해당 장소 상세정보를 반환합니다.',
   })
   getPlaceDetail(
