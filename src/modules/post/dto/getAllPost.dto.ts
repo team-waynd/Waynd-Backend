@@ -23,4 +23,7 @@ export class GetAllPostDto {
   created_at: Date;
 
   updated_at: Date | null;
+
+  @ApiProperty({ example: 5 })
+  likes: number;
 }

@@ -1,5 +1,5 @@
 import { PrimaryGeneratedColumn, Entity, Column } from 'typeorm';
-
+import { OneToMany, ManyToOne } from 'typeorm';
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
@@ -25,6 +25,9 @@ export class Post {
 
   @Column({ type: 'timestamp', nullable: true })
   updated_at: Date | null;
+
+  @OneToMany(() => PostLike, (like) => like.post)
+  likes: PostLike[];
 }
 
 @Entity('post_images')
@@ -73,4 +76,7 @@ export class PostLike {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  @ManyToOne(() => Post, (post) => post.likes)
+  post: Post;
 }
