@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/createPost.dto';
-import { Post, PostImage, PostTag, Tag } from './post.entity';
+import { Post, PostImage, PostLike, PostTag, Tag } from './post.entity';
 import { DataSource } from 'typeorm';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class PostService {
@@ -17,6 +18,8 @@ export class PostService {
     private postTagRepository: Repository<PostTag>,
     @InjectRepository(Tag)
     private tagRepository: Repository<Tag>,
+    @InjectRepository(PostLike)
+    private likeRepository: Repository<PostLike>,
   ) {}
 
   async getAllPosts() {
@@ -129,5 +132,32 @@ export class PostService {
         await this.postTagRepository.save(tags);
       }
     });
+  }
+
+  async likePost(
+    postId: string,
+    userId: string,
+  ): Promise<{ liked: boolean; message: string }> {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('게시글이 존재하지 않습니다.');
+    }
+
+    const existing = await this.likeRepository.findOne({
+      where: { post_id: postId, user_id: userId },
+    });
+
+    if (existing) {
+      await this.likeRepository.delete({ id: existing.id });
+      return { liked: false, message: '좋아요 취소' };
+    }
+
+    const like = this.likeRepository.create({
+      post_id: postId,
+      user_id: userId,
+    });
+
+    await this.likeRepository.save(like);
+    return { liked: true, message: '좋아요 완료' };
   }
 }

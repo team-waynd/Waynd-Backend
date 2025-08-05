@@ -6,6 +6,8 @@ import {
   Delete,
   Param,
   Patch,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/createPost.dto';
 import { PostService } from './post.service';
@@ -13,6 +15,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeletePostDto } from './dto/deletePost.dto';
 import { GetAllPostDto } from './dto/getAllPost.dto';
 import { PatchPostDto } from './dto/patchPost.dto';
+import { JwtAuthGuard } from '../auth/guards/auth.guard';
 
 @ApiTags('Post')
 @Controller('post')
@@ -62,5 +65,12 @@ export class PostController {
   })
   updatePost(@Param('id') id: string, @Body() updatePostDto: CreatePostDto) {
     return this.postService.updatePost(id, updatePostDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/like/:id')
+  async likePost(@Param('id') postId: string, @Req() req) {
+    const userId = req.user.id;
+    return this.postService.likePost(postId, userId);
   }
 }
