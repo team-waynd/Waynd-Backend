@@ -7,21 +7,33 @@ import {
   KakaoAuthGuard,
 } from './guards/auth.guard';
 import { User } from '../user/user.entity';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 interface JwtPayload {
   sub: string;
   email: string;
 }
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('google')
+  @ApiOperation({ summary: '구글 로그인' })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 AccessToken 과 Refresh Token을 반환합니다.',
+  })
   @UseGuards(GoogleAuthGuard)
   async googleAuth(): Promise<void> {}
 
   @Get('google/redirect')
+  @ApiOperation({ summary: '구글 리다이렉트' })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 AccessToken 과 Refresh Token을 반환합니다.',
+  })
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(
     @Req() req: Request,
@@ -31,10 +43,20 @@ export class AuthController {
   }
 
   @Get('kakao')
+  @ApiOperation({ summary: '카카오 로그인' })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 AccessToken 과 Refresh Token을 반환합니다.',
+  })
   @UseGuards(KakaoAuthGuard)
   async kakaoAuth(): Promise<void> {}
 
   @Get('kakao/redirect')
+  @ApiOperation({ summary: '카카오 리다이렉션' })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 AccessToken 과 Refresh Token을 반환합니다.',
+  })
   @UseGuards(KakaoAuthGuard)
   async kakaoAuthRedirect(
     @Req() req: Request,
@@ -45,6 +67,11 @@ export class AuthController {
 
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
+  @ApiOperation({ summary: '리프레시 토큰' })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 AccessToken 과 Refresh Token을 반환합니다.',
+  })
   async refresh(
     @Req() req: Request,
   ): Promise<ReturnType<AuthService['refreshToken']>> {

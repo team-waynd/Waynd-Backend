@@ -62,5 +62,5 @@ export class FoodSpot {
   rating: number;
 
   @Column()
-  weather: string;
+  season: string;
 }
