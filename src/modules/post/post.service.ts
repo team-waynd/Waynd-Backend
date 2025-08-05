@@ -27,17 +27,20 @@ export class PostService {
 
     const postIds = posts.map((post) => post.id);
 
-    const images = await this.postImageRepository.find({
-      where: { post_id: In(postIds) },
-    });
-
-    const postTags = await this.postTagRepository.find({
-      where: { post_id: In(postIds) },
-    });
+    const [images, postTags, likes] = await Promise.all([
+      this.postImageRepository.find({ where: { post_id: In(postIds) } }),
+      this.postTagRepository.find({ where: { post_id: In(postIds) } }),
+      this.likeRepository.find({ where: { post_id: In(postIds) } }),
+    ]);
 
     const tagIds = postTags.map((pt) => pt.tag_id);
     const tags = await this.tagRepository.find({
       where: { id: In(tagIds) },
+    });
+
+    const likeCountMap: Record<string, number> = {};
+    likes.forEach((like) => {
+      likeCountMap[like.post_id] = (likeCountMap[like.post_id] || 0) + 1;
     });
 
     const result = posts.map((post) => {
@@ -46,11 +49,12 @@ export class PostService {
         .filter((pt) => pt.post_id === post.id)
         .map((pt) => pt.tag_id);
       const postTagsData = tags.filter((tag) => relatedTagIds.includes(tag.id));
-
+      const likesCount = likeCountMap[post.id] || 0;
       return {
         ...post,
         images: postImages,
         tags: postTagsData,
+        likes: likesCount,
       };
     });
 
